@@ -1,0 +1,214 @@
+﻿<Window x:Class="WPF.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WPF"
+        mc:Ignorable="d"
+        Title="UberBOM" Height="350" Width="235">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="0*"/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <TabControl Grid.ColumnSpan="2">
+            <TabItem Header="Weight Cost" Margin="0,0,-23,-2">
+                <Border Grid.Row="4" Grid.Column="2"
+                        BorderThickness="1"
+                        Margin="5">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="25"/>
+                            <RowDefinition Height="25"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="50"/>
+                        </Grid.RowDefinitions>
+
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*"/>
+                            <ColumnDefinition Width="1*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Label for bills folder -->
+                        <Border BorderThickness="1"
+                                BorderBrush="Black"
+                                Height="20"
+                                VerticalAlignment="Top">
+                            <TextBlock Grid.Row="0"
+                                   Name="billsPath"
+                                   Grid.Column="0"
+                                   Grid.ColumnSpan="1"
+                                   HorizontalAlignment="Left"
+                                   Height="20"
+                                   Text="Click Browse..."/>
+                        </Border>
+
+                        <!-- Browse Button For Folders Path -->
+                        <Button Grid.Row="0" Grid.Column="1"
+                                Content="Browse" Height="20"
+                                Width="50"
+                                VerticalAlignment="Top"
+                                Name="btnBillsFolder" Click="btnBillsFolder_Click"/>
+
+                        <!-- Messages Dialog 1 -->
+                        <Border Grid.Row="2" Grid.Column="0"
+                                Grid.ColumnSpan="2"
+                                BorderThickness="1">
+
+                            <RichTextBox x:Name="Messages"
+                                         Background="LightBlue"
+                                        Width="Auto"
+                                        VerticalScrollBarVisibility="Auto">
+                                <RichTextBox.Resources>
+                                    <Style TargetType="{x:Type Paragraph}">
+                                        <Setter Property="Margin" Value="0"/>
+                                    </Style>
+                                </RichTextBox.Resources>
+                            </RichTextBox>
+
+                        </Border>
+
+                        <!-- Go! Button -->
+                        <Button Grid.Row="3" Grid.Column="2"
+                                Content="Go!" Height="20"
+                                Name="btnGo" Click="btnGo_Click"/>
+
+                    </Grid>
+                </Border>
+            </TabItem>
+            <TabItem Header="Structured BOM" RenderTransformOrigin="7.416,7.286" Margin="22,0,-26,-2">
+                <Border Grid.Row="4" Grid.Column="2"
+                        BorderThickness="1"
+                        Margin="5">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="25"/>
+                            <RowDefinition Height="25"/>
+                            <RowDefinition Height="25"/>
+                            <RowDefinition Height="25"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="50"/>
+                        </Grid.RowDefinitions>
+
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*"/>
+                            <ColumnDefinition Width="1*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Label for Results Weight Path to EXCEL -->
+                        <Border BorderThickness="1"
+                                BorderBrush="Black"
+                                Height="20"
+                                VerticalAlignment="Top"
+                                Grid.Row="0">
+                            <TextBlock Grid.Row="0"
+                                   Name="resultWeightCostPath"
+                                   Grid.Column="0"
+                                   Grid.ColumnSpan="1"
+                                   HorizontalAlignment="Left"
+                                   Height="20"
+                                   Text="Results Weight Cost File..."/>
+                        </Border>
+
+                        <!-- Browse Button for Results Weight Path to EXCEL -->
+                        <Button Grid.Row="0" Grid.Column="1"
+                                Content="Browse" Height="20"
+                                Width="50"
+                                VerticalAlignment="Top"
+                                Name="btnResultWeightCostEXL" Click="btnOpenResultsFile_Click"/>
+
+                        <!-- Label for P Path to EXCEL -->
+                        <Border BorderThickness="1"
+                                BorderBrush="Black"
+                                Height="20"
+                                VerticalAlignment="Top"
+                                Grid.Row="1">
+                            <TextBlock Grid.Row="1"
+                                   Name="pPath"
+                                   Grid.Column="0"
+                                   Grid.ColumnSpan="1"
+                                   HorizontalAlignment="Left"
+                                   Height="20"
+                                   Text="'P' File..."/>
+                        </Border>
+
+                        <!-- Browse Button for P Path to EXCEL -->
+                        <Button Grid.Row="1" Grid.Column="1"
+                                Content="Browse" Height="20"
+                                Width="50"
+                                VerticalAlignment="Top"
+                                Name="btnPEXL" Click="btnOpenPFile_Click"/>
+
+                        <!-- Label for S Path to EXCEL -->
+                        <Border BorderThickness="1"
+                                BorderBrush="Black"
+                                Height="20"
+                                VerticalAlignment="Top"
+                                Grid.Row="2">
+                            <TextBlock Grid.Row="2"
+                                   Name="sPath"
+                                   Grid.Column="0"
+                                   Grid.ColumnSpan="1"
+                                   HorizontalAlignment="Left"
+                                   Height="20"
+                                   Text="'S' File..."/>
+                        </Border>
+
+                        <!-- Browse Button for S Path to EXCEL -->
+                        <Button Grid.Row="2" Grid.Column="1"
+                                Content="Browse" Height="20"
+                                Width="50"
+                                VerticalAlignment="Top"
+                                Name="btnSEXL" Click="btnOpenSFile_Click"/>
+
+                        <!-- Label for Material Agregado Path to EXCEL -->
+                        <Border BorderThickness="1"
+                                BorderBrush="Black"
+                                Height="20"
+                                VerticalAlignment="Top"
+                                Grid.Row="3">
+                            <TextBlock Grid.Row="3"
+                                   Name="materialAgreadoPath"
+                                   Grid.Column="0"
+                                   Grid.ColumnSpan="1"
+                                   HorizontalAlignment="Left"
+                                   Height="20"
+                                   Text="'Material Agregado' File..."/>
+                        </Border>
+
+                        <!-- Browse Button for S Path to EXCEL -->
+                        <Button Grid.Row="3" Grid.Column="1"
+                                Content="Browse" Height="20"
+                                Width="50"
+                                VerticalAlignment="Top"
+                                Name="btnMaterialAgregadoEXL" Click="btnOpenMaterialAgregadoFile_Click"/>
+
+                        <!-- Messages Dialog -->
+                        <Border Grid.Row="4" Grid.Column="0"
+                                Grid.ColumnSpan="2"
+                                BorderThickness="1">
+
+                            <RichTextBox x:Name="Messages1"
+                                         Background="LightBlue"
+                                        Width="Auto"
+                                        VerticalScrollBarVisibility="Auto">
+                                <RichTextBox.Resources>
+                                    <Style TargetType="{x:Type Paragraph}">
+                                        <Setter Property="Margin" Value="0"/>
+                                    </Style>
+                                </RichTextBox.Resources>
+                            </RichTextBox>
+
+                        </Border>
+
+                        <!-- Go! Button -->
+                        <Button Grid.Row="5" Grid.Column="2"
+                                Content="Go!" Height="20"
+                                Name="btnGo1" Click="btnGo1_Click"/>
+
+                    </Grid>
+                </Border>
+            </TabItem>
+        </TabControl>
+    </Grid>
+</Window>
