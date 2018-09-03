@@ -95,7 +95,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\..\abraham.cacoulides\source\repos\UberTitle\Engine\Engine.csproj">
+    <ProjectReference Include="..\Engine\Engine.csproj">
       <Project>{ba3aeae3-8ad7-419e-8cee-828272da196c}</Project>
       <Name>Engine</Name>
     </ProjectReference>

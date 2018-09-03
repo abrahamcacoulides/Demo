@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Linq;
 using System.Windows;
 using System.Windows.Documents;
-using Microsoft.Win32;
 using Engine.EventArgs;
 using Engine.ViewModels;
-using System.IO;
 using System.Windows.Forms;
 
 namespace WPF
@@ -51,13 +48,15 @@ namespace WPF
 
         private void btnGo1_Click(object sender, RoutedEventArgs e)
         {
-            _session.GoButton();
+            _session.GoButton1();
         }
 
         private void OnMessageRaised(object sender, MessageEventArgs e)
         {
             Messages.Document.Blocks.Add(new Paragraph(new Run(e.Message)));
             Messages.ScrollToEnd();
+            Messages1.Document.Blocks.Add(new Paragraph(new Run(e.Message)));
+            Messages1.ScrollToEnd();
         }
 
         private void btnOpenSFile_Click(object sender, RoutedEventArgs e)
@@ -68,9 +67,11 @@ namespace WPF
             openFileDialog.Multiselect = false;
             openFileDialog.Title = "Please Select The S File";
             if (openFileDialog.ShowDialog() == true)
+            {
                 sPath.Text = String.Empty;
-            _session._sPath = openFileDialog.FileName;
-            sPath.Text = _session._sPath;
+                _session._sPath = openFileDialog.FileName;
+                sPath.Text = _session._sPath;
+            }
         }
 
         private void btnOpenPFile_Click(object sender, RoutedEventArgs e)
@@ -94,9 +95,11 @@ namespace WPF
             openFileDialog.Multiselect = false;
             openFileDialog.Title = "Please Select The Results Weight File";
             if (openFileDialog.ShowDialog() == true)
+            {
                 resultWeightCostPath.Text = String.Empty;
-            _session._resultsPath = openFileDialog.FileName;
-            resultWeightCostPath.Text = _session._resultsPath;
+                _session._resultsPath = openFileDialog.FileName;
+                resultWeightCostPath.Text = _session._resultsPath;
+            }
         }
 
         private void btnOpenMaterialAgregadoFile_Click(object sender, RoutedEventArgs e)
