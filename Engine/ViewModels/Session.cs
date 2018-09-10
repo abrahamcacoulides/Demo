@@ -7,6 +7,7 @@ using System.IO;
 using NPOI.XSSF.UserModel;
 using NPOI.SS.UserModel;
 using NPOI.HSSF.Util;
+using System.Threading.Tasks;
 
 namespace Engine.ViewModels
 {
@@ -38,6 +39,14 @@ namespace Engine.ViewModels
         // local path to Material Agregado Path
         public string _materialAgregadoPath;
 
+        // local path to which the Results file would be saved
+        public string _resultsSaveToPath;
+
+        // local path to Final Results File
+        public string _resultsSaveToPath1;
+
+        public string _savedIN;
+
         private void RaiseMessage(string message)
         {
             OnMessageRaised?.Invoke(this, new MessageEventArgs(message));
@@ -45,29 +54,64 @@ namespace Engine.ViewModels
 
         public void GoButton()
         {
-            List<string> facturas = GetExcelFilesInDirectory(_billsPath);
-            
-            ReadBillsInPath(facturas);
-            Facturas();
-            RaiseMessage("Done!");
+            if (Directory.Exists(_billsPath))
+            {
+                List<string> facturas = GetExcelFilesInDirectory(_billsPath);
+                ReadBillsInPath(facturas,2,3,10,9,8,7);
+                if (_resultsSaveToPath == "")
+                {
+                    _resultsSaveToPath = @"newbook.core.xlsx";
+                }
+                Facturas(_resultsSaveToPath);
+                RaiseMessage("Results file saved to: " + _resultsSaveToPath);
+            }
+            else
+            {
+                RaiseMessage("Please select the path to the bills folder...");
+            }
         }
 
         public void GoButton1()
         {
-            ReadFromResultsFile(_resultsPath);
-            MCO(_sPath);
-            LoopThroughItemsToAdd(_pPath, 4, 1, 11, 10);
-            LoopThroughItemsToAdd(_materialAgregadoPath, 4, 1, 11, 10);
-            ItemsToAdd();
-            Results();
-            //Console.WriteLine("Records: " + Records.Count().ToString());
-            //Console.WriteLine("Records to add: " + RecordsToAdd.Count().ToString());
-            //Console.WriteLine("Records with added PO " + Records_With_Added_PO.Count().ToString());
-            //foreach (SO job in jobsList)
-            //{
-            //    RaiseMessage(job.Product);
-            //}
-            RaiseMessage("Done!");
+            if (File.Exists(_resultsPath) && Path.GetExtension(_resultsPath) == ".xlsx")
+            {
+                if (File.Exists(_pPath) && Path.GetExtension(_pPath) == ".xlsx")
+                {
+                    if (File.Exists(_sPath) && Path.GetExtension(_sPath) == ".xlsx")
+                    {
+                        if (File.Exists(_materialAgregadoPath) && Path.GetExtension(_materialAgregadoPath) == ".xlsx")
+                        {
+                            if (_resultsSaveToPath1 == "")
+                            {
+                                _resultsSaveToPath1 = @"newbookResults.core.xlsx";
+                            }
+                            ReadFromResultsFile(_resultsPath);
+                            MCO(_sPath,3,14,1,10);
+                            LoopThroughItemsToAdd(_pPath, 4, 1, 11, 10);
+                            LoopThroughItemsToAdd(_materialAgregadoPath, 4, 1, 11, 10);
+                            ItemsToAdd();
+                            Results(_resultsSaveToPath1);
+                            RaiseMessage("Results saved to: " + _resultsSaveToPath1);
+                        }
+                        else
+                        {
+                            RaiseMessage("There seems to be a problem with the 'Material Agregado' File, confirm your selection is an .xlsx file");
+                        }
+                    }
+                    else
+                    {
+                        RaiseMessage("There seems to be a problem with the 'S' File, confirm your selection is an .xlsx file");
+                    }
+                }
+                else
+                {
+                    RaiseMessage("There seems to be a problem with the 'P' File, confirm your selection is an .xlsx file");
+                }
+            }
+            else
+            {
+                RaiseMessage("There seems to be a problem with the 'Results' File, confirm your selection is an .xlsx file");
+            }
         }
 
         public static List<string> GetExcelFilesInDirectory(string targetDirectory)
@@ -81,8 +125,7 @@ namespace Engine.ViewModels
             return filesList;
         }
 
-
-        public void ReadBillsInPath(List<string> bills)
+        public void ReadBillsInPath(List<string> bills, int jobNumCol, int poCol, int costCol, int addedValueCol, int weightCol, int umCol)
         {
             int count = 1;
             XSSFWorkbook billwb;
@@ -91,7 +134,6 @@ namespace Engine.ViewModels
             {
                 if (bill.Contains("~$"))
                 {
-                    RaiseMessage("Why?: " + bill);
                 }
                 else
                 {
@@ -116,27 +158,26 @@ namespace Engine.ViewModels
                             sheet_count += 1;
                             blanks += 1;
                         }
-                        else if (current_sheet.GetRow(sheet_count).GetCell(2).CellType != CellType.Numeric || current_sheet.GetRow(sheet_count).GetCell(3).CellType != CellType.Numeric)
+                        else if (current_sheet.GetRow(sheet_count).GetCell(jobNumCol).CellType != CellType.Numeric || current_sheet.GetRow(sheet_count).GetCell(poCol).CellType != CellType.Numeric)
                         {
                             sheet_count += 1;
                             blanks += 1;
                         }
-                        else if (current_sheet.GetRow(sheet_count).GetCell(2) != null && current_sheet.GetRow(sheet_count).GetCell(3) != null)
+                        else if (current_sheet.GetRow(sheet_count).GetCell(jobNumCol) != null && current_sheet.GetRow(sheet_count).GetCell(poCol) != null)
                         {
                             blanks = 0;
-                            string product = current_sheet.GetRow(sheet_count).GetCell(2).NumericCellValue.ToString() + '-' + current_sheet.GetRow(sheet_count).GetCell(3).NumericCellValue.ToString();
-                            if( jobsList.FirstOrDefault(j => j.PO == current_sheet.GetRow(sheet_count).GetCell(3).NumericCellValue.ToString()) != null)
+                            string product = current_sheet.GetRow(sheet_count).GetCell(jobNumCol).NumericCellValue.ToString() + '-' + current_sheet.GetRow(sheet_count).GetCell(poCol).NumericCellValue.ToString();
+                            if( jobsList.FirstOrDefault(j => j.PO == current_sheet.GetRow(sheet_count).GetCell(poCol).NumericCellValue.ToString()) != null)
                             {
-                                Console.WriteLine("PO: " + current_sheet.GetRow(sheet_count).GetCell(3).NumericCellValue.ToString() + " repeated! on bill: " + bill);
                             }
                             else
                             {
-                                string job_num = current_sheet.GetRow(sheet_count).GetCell(2).NumericCellValue.ToString();
-                                string po = current_sheet.GetRow(sheet_count).GetCell(3).NumericCellValue.ToString();
-                                double cost = current_sheet.GetRow(sheet_count).GetCell(10).NumericCellValue;
-                                double addedValue = current_sheet.GetRow(sheet_count).GetCell(9).NumericCellValue;
-                                double weight = current_sheet.GetRow(sheet_count).GetCell(8).NumericCellValue;
-                                string um = current_sheet.GetRow(sheet_count).GetCell(7).ToString();
+                                string job_num = current_sheet.GetRow(sheet_count).GetCell(jobNumCol).NumericCellValue.ToString();
+                                string po = current_sheet.GetRow(sheet_count).GetCell(poCol).NumericCellValue.ToString();
+                                double cost = current_sheet.GetRow(sheet_count).GetCell(costCol).NumericCellValue;
+                                double addedValue = current_sheet.GetRow(sheet_count).GetCell(addedValueCol).NumericCellValue;
+                                double weight = current_sheet.GetRow(sheet_count).GetCell(weightCol).NumericCellValue;
+                                string um = current_sheet.GetRow(sheet_count).GetCell(umCol).ToString();
                                 string factura = bill;
                                 jobsList.Add(new SO(product, job_num, po, cost, addedValue, weight, um, factura));
                                 count += 1;
@@ -153,11 +194,9 @@ namespace Engine.ViewModels
             }
         }
 
-        private static void Facturas()
+        private static void Facturas(string saveAs)
         {
-            var newFile = @"newbook.core.xlsx";
-
-            using (var fs = new FileStream(newFile, FileMode.Create, FileAccess.Write))
+            using (var fs = new FileStream(saveAs, FileMode.Create, FileAccess.Write))
             {
                 IWorkbook workbook = new XSSFWorkbook();
                 ISheet current_sheet = workbook.CreateSheet("Results");
@@ -206,57 +245,57 @@ namespace Engine.ViewModels
                 }
                 workbook.Write(fs);
             }
-            Console.WriteLine("Excel  Done");
         }
-
-        public static void MCO(string mco)
+        
+        public static void MCO(string spreadsheet, int startingRow, int poCol, int materialCol, int qtyCol)
         {
             XSSFWorkbook mcoWB;
 
-            using (FileStream file = new FileStream(mco, FileMode.Open, FileAccess.Read))
+            using (FileStream file = new FileStream(spreadsheet, FileMode.Open, FileAccess.Read))
             {
                 mcoWB = new XSSFWorkbook(file);
             }
 
             ISheet mco_sheet = mcoWB.GetSheetAt(0);
-            int starting_row_current_sheet = 3;
+            int starting_row_current_sheet = startingRow;
+            int starting_row_current_sheet_1 = startingRow;
+
             var positive_items = new Dictionary<string, double>();
 
             // this while goes to the MCO WB and records in the positive items dictionary the items with a positive value in the qty
             while (mco_sheet.GetRow(starting_row_current_sheet) != null)
             {
                 {
-                    if (mco_sheet.GetRow(starting_row_current_sheet).GetCell(10).NumericCellValue > 0)
+                    if (mco_sheet.GetRow(starting_row_current_sheet).GetCell(qtyCol).NumericCellValue > 0)
                     {
                         // the dictionary key is po-material#
-                        string key = mco_sheet.GetRow(starting_row_current_sheet).GetCell(14).NumericCellValue.ToString() + '-' + mco_sheet.GetRow(starting_row_current_sheet).GetCell(1).StringCellValue;
+                        string key = mco_sheet.GetRow(starting_row_current_sheet).GetCell(poCol).NumericCellValue.ToString() + '-' + mco_sheet.GetRow(starting_row_current_sheet).GetCell(materialCol).StringCellValue;
+                        double qty = mco_sheet.GetRow(starting_row_current_sheet).GetCell(qtyCol).NumericCellValue;
                         if (positive_items.ContainsKey(key))
                         {
-                            positive_items[key] += mco_sheet.GetRow(starting_row_current_sheet).GetCell(10).NumericCellValue;
+                            positive_items[key] += qty;
                         }
                         else
                         {
-                            positive_items.Add(key, mco_sheet.GetRow(starting_row_current_sheet).GetCell(10).NumericCellValue);
+                            positive_items.Add(key, qty);
                         }
                     }
                     starting_row_current_sheet++;
                 }
             }
 
-            starting_row_current_sheet = 3; //resetting counter
-
             // the following while loops through all the records in the MCO excel and if the po is in the bill po's list it checks if the qty value is negative, 
             // if it is it then proceeds to look for the item in the positive_items dict,
             // if it exist it compares the value in the dict and the qty, if they are equal it deletes the record and goes to the next record in the file
             // if the qty and value in the dict are not equal it adds the current record to the list of objects
             // in case it is not in the positive_items dict it proceeds to add the current record to the list of objects
-            while (mco_sheet.GetRow(starting_row_current_sheet) != null)
+            while (mco_sheet.GetRow(starting_row_current_sheet_1) != null)
             {
-                string po = mco_sheet.GetRow(starting_row_current_sheet).GetCell(14).NumericCellValue.ToString();
+                string po = mco_sheet.GetRow(starting_row_current_sheet_1).GetCell(poCol).NumericCellValue.ToString();
 
-                double qty = mco_sheet.GetRow(starting_row_current_sheet).GetCell(10).NumericCellValue;
+                double qty = mco_sheet.GetRow(starting_row_current_sheet_1).GetCell(qtyCol).NumericCellValue;
 
-                string material = mco_sheet.GetRow(starting_row_current_sheet).GetCell(1).StringCellValue;
+                string material = mco_sheet.GetRow(starting_row_current_sheet_1).GetCell(materialCol).StringCellValue;
 
                 // the dictionary key is po-material
                 string key = po + '-' + material;
@@ -281,7 +320,7 @@ namespace Engine.ViewModels
                                         Product = job.Product,
                                         Material = material,
                                         Qty = qty * -1,
-                                        UM = mco_sheet.GetRow(starting_row_current_sheet).GetCell(11).StringCellValue
+                                        UM = mco_sheet.GetRow(starting_row_current_sheet_1).GetCell(11).StringCellValue
                                     });
                             }
                         }
@@ -294,12 +333,12 @@ namespace Engine.ViewModels
                                         Product = job.Product,
                                         Material = material,
                                         Qty = qty * -1,
-                                        UM = mco_sheet.GetRow(starting_row_current_sheet).GetCell(11).StringCellValue
+                                        UM = mco_sheet.GetRow(starting_row_current_sheet_1).GetCell(11).StringCellValue
                                     });
                         }
                     }
                 }
-                starting_row_current_sheet++;
+                starting_row_current_sheet_1++;
             }
         }
 
@@ -472,7 +511,6 @@ namespace Engine.ViewModels
 
             while (current_sheet.GetRow(row_count) != null)
             {
-                Console.WriteLine("row_count: " + row_count.ToString());
                 string product = current_sheet.GetRow(row_count).GetCell(0).StringCellValue;
                 double cost = current_sheet.GetRow(row_count).GetCell(2).NumericCellValue;
                 double addedValue = current_sheet.GetRow(row_count).GetCell(3).NumericCellValue;
@@ -486,11 +524,10 @@ namespace Engine.ViewModels
             }
         }
 
-        private static void Results()
+        private static void Results(string saveAs)
         {
-            var newFile = @"resultsbook.core.xlsx";
 
-            using (var fs = new FileStream(newFile, FileMode.Create, FileAccess.Write))
+            using (var fs = new FileStream(saveAs, FileMode.Create, FileAccess.Write))
             {
                 IWorkbook workbook = new XSSFWorkbook();
                 ISheet current_sheet = workbook.CreateSheet("Results");
@@ -579,7 +616,6 @@ namespace Engine.ViewModels
                 }
                 workbook.Write(fs);
             }
-            Console.WriteLine("Excel  Done");
         }
     }
 }

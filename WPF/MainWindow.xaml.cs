@@ -4,6 +4,7 @@ using System.Windows.Documents;
 using Engine.EventArgs;
 using Engine.ViewModels;
 using System.Windows.Forms;
+using System.Threading.Tasks;
 
 namespace WPF
 {
@@ -43,12 +44,50 @@ namespace WPF
 
         private void btnGo_Click(object sender, RoutedEventArgs e)
         {
-            _session.GoButton();
+            SaveFileDialog saveFileDialog1 = new SaveFileDialog();
+            saveFileDialog1.Filter = "Excel Files|*.xls;*.xlsx;*.xlsm";
+            saveFileDialog1.DefaultExt = "xlsx";
+            saveFileDialog1.Title = "Save the resulting file";
+            saveFileDialog1.FileName = "Result";
+            saveFileDialog1.InitialDirectory = @"C:\";
+            DialogResult result = saveFileDialog1.ShowDialog();
+            if (result == System.Windows.Forms.DialogResult.OK)
+            {
+                if (saveFileDialog1.FileName != "")
+                {
+                    _session._resultsSaveToPath = saveFileDialog1.FileName;
+                    _session.GoButton();
+                }
+                else
+                {
+                    _session._resultsSaveToPath = "";
+                    _session.GoButton();
+                }
+            }
         }
 
         private void btnGo1_Click(object sender, RoutedEventArgs e)
         {
-            _session.GoButton1();
+            SaveFileDialog saveFileDialog2 = new SaveFileDialog();
+            saveFileDialog2.Filter = "Excel Files|*.xls;*.xlsx;*.xlsm";
+            saveFileDialog2.DefaultExt = "xlsx";
+            saveFileDialog2.Title = "Save the resulting file";
+            saveFileDialog2.FileName = "FinalResult";
+            saveFileDialog2.InitialDirectory = @"C:\";
+            DialogResult result = saveFileDialog2.ShowDialog();
+            if (result == System.Windows.Forms.DialogResult.OK)
+            {
+                if (saveFileDialog2.FileName != "")
+                {
+                    _session._resultsSaveToPath1 = saveFileDialog2.FileName;
+                    _session.GoButton1();
+                }
+                else
+                {
+                    _session._resultsSaveToPath1 = "";
+                    _session.GoButton1();
+                }
+            }
         }
 
         private void OnMessageRaised(object sender, MessageEventArgs e)
